@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: GitHub Discussions
+    url: https://github.com/pqpcara/github-analyzer/discussions
+    about: For general discussions and ideas
+  - name: Documentation
+    url: https://github.com/pqpcara/github-analyzer/blob/main/README.md
+    about: Read the complete project documentation
