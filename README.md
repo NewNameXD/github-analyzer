@@ -18,7 +18,10 @@ A professional web application that analyzes GitHub profiles using Groq AI (Llam
 
 ## Features
 
-- **AI-Powered Analysis**: Uses Groq's Llama 3.3 70B model for intelligent evaluation
+- **AI-Powered Analysis**: Uses Groq's Llama 3.3 70B model for intelligent, human-like evaluation
+- **Repository Deep Dive**: Analyzes folder structure and README content of each repository
+- **Smart Prompt Splitting**: Automatically splits large profiles into two API calls if needed
+- **Natural Language**: Responses sound like a real developer, not corporate AI
 - **Multi-Language Support**: Interface and evaluation in 7 languages (EN, PT, ES, FR, DE, JA, ZH)
 - **Comprehensive Evaluation**: Analyzes repositories, documentation, activity, and market perception
 - **Modern UI**: Beautiful, responsive interface built with Tailwind CSS
@@ -141,6 +144,16 @@ Server will start on `http://localhost:8080`
 3. **Critical Weaknesses**: Areas needing improvement (no sugar-coating)
 4. **Recommendations**: Concrete, prioritized actions
 5. **Market Perception**: How recruiters/hiring managers view the profile
+
+### Repository Analysis
+
+For each repository, the system now analyzes:
+- **Folder Structure**: Lists all files and directories in the root
+- **README Content**: Reads and includes README.md content (up to 500 chars preview)
+- **Technologies**: Identifies programming languages and frameworks
+- **Topics/Tags**: Extracts repository topics for better categorization
+
+This provides much deeper insights into code organization and project quality.
 
 ### Multi-Language Interface
 

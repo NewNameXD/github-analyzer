@@ -1,2 +1,5 @@
 .env
 go.sum
+webs/
+.gitignore
+*.zip
