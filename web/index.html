@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GitHub Profile Evaluator</title>
+    <title>GitHub Profile Analyzer - PQPCARA</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
@@ -135,7 +135,7 @@
                     <span class="text-sm font-semibold tracking-wider">@pqpcara</span>
                 </div>
             </div>
-            <h1 class="text-5xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-white via-cyan-400 to-blue-400 bg-clip-text text-transparent">
+            <h1 class="text-5xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-white via-cyan-400 to-blue-400 bg-clip-text text-transparent" data-i18n="title">
                 GitHub Analysis
             </h1>
             <p class="text-xl text-gray-400 max-w-2xl mx-auto" data-i18n="subtitle">
@@ -158,7 +158,7 @@
                     </div>
                     <button 
                         id="analyzeBtn"
-                        class="px-8 py-4 bg-gradient-to-r from-cyan-500 to-cyan-600 text-black rounded-xl font-semibold hover:from-cyan-400 hover:to-cyan-500 active:scale-95 transition-all flex items-center justify-center gap-2 group"
+                        class="px-8 py-4 bg-gradient-to-r from-cyan-500 to-cyan-600 text-white/80 rounded-xl font-semibold hover:from-cyan-400 hover:to-cyan-500 active:scale-95 transition-all flex items-center justify-center gap-2 group"
                     >
                         <i class="fas fa-chart-line group-hover:scale-110 transition-transform"></i>
                         <span data-i18n="analyzeButton">Analyze Profile</span>
@@ -204,7 +204,7 @@
                 <div class="bg-dark-card rounded-xl border border-dark-border p-8">
                     <div class="flex items-center gap-3 mb-6">
                         <i class="fas fa-robot text-2xl text-cyan-400"></i>
-                        <h2 class="text-2xl font-bold">AI Evaluation</h2>
+                        <h2 class="text-2xl font-bold" data-i18n="aiEvaluation">AI Evaluation</h2>
                     </div>
                     <div id="evaluation" class="markdown-content"></div>
                 </div>
@@ -234,7 +234,7 @@
                 <a 
                     href="https://github.com/pqpcara/github-analyzer" 
                     target="_blank"
-                    class="flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-400 hover:to-cyan-500 text-black rounded-xl transition-all group"
+                    class="flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-400 hover:to-cyan-500 text-white/90 rounded-xl transition-all group"
                 >
                     <i class="fas fa-star text-xl group-hover:scale-110 transition-transform"></i>
                     <span data-i18n="starButton">Star this project</span>
@@ -248,7 +248,7 @@
 
         <footer class="text-center py-8 text-gray-500 text-sm">
             <div class="flex items-center justify-center gap-2 flex-wrap">
-                <span data-i18n="footerPowered">Powered by Groq AI | Made with</span>
+                <span data-i18n="footerPowered">Powered by PQPCARA AI | Made with</span>
                 <i class="fas fa-heart text-cyan-400 animate-pulse"></i>
                 <span data-i18n="footerBy">by</span>
                 <a href="https://github.com/pqpcara" target="_blank" class="text-cyan-400 hover:text-cyan-300 hover:underline transition-colors">@pqpcara</a>

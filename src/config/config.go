@@ -6,15 +6,15 @@ import (
 )
 
 type Config struct {
-	Port        string
-	GroqAPIKey  string
-	GitHubToken string
+	Port             string
+	OpenRouterAPIKey string
+	GitHubToken      string
 }
 
 func Load() *Config {
-	groqKey := os.Getenv("GROQ_API_KEY")
-	if groqKey == "" {
-		log.Fatal("GROQ_API_KEY is required in .env file")
+	openRouterKey := os.Getenv("OPENROUTER_API_KEY")
+	if openRouterKey == "" {
+		log.Fatal("OPENROUTER_API_KEY is required in .env file")
 	}
 
 	port := os.Getenv("PORT")
@@ -25,8 +25,8 @@ func Load() *Config {
 	githubToken := os.Getenv("GITHUB_TOKEN")
 
 	return &Config{
-		Port:        port,
-		GroqAPIKey:  groqKey,
-		GitHubToken: githubToken,
+		Port:             port,
+		OpenRouterAPIKey: openRouterKey,
+		GitHubToken:      githubToken,
 	}
 }

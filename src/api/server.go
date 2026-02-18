@@ -2,9 +2,11 @@ package api
 
 import (
 	"net/http"
+	"time"
 
 	"github-analyzer/src/config"
 	"github-analyzer/src/handlers"
+	"github-analyzer/src/middleware"
 	"github-analyzer/src/services"
 )
 
@@ -15,7 +17,7 @@ type Server struct {
 
 func NewServer(cfg *config.Config) *Server {
 	githubService := services.NewGitHubService(cfg.GitHubToken)
-	aiService := services.NewAIService(cfg.GroqAPIKey)
+	aiService := services.NewAIService(cfg.OpenRouterAPIKey)
 
 	handler := handlers.NewHandler(githubService, aiService)
 
@@ -36,7 +38,10 @@ func (s *Server) Start() error {
 
 	mux.HandleFunc("/", s.handler.ServeHome)
 
-	handler := enableCORS(mux)
+	rateLimiter := middleware.NewRateLimiter(60 * time.Second)
+	handler := middleware.RateLimitMiddleware(rateLimiter)(mux)
+
+	handler = enableCORS(handler)
 
 	return http.ListenAndServe(":"+s.config.Port, handler)
 }

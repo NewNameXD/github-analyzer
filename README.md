@@ -2,11 +2,11 @@
 
 > Honest, AI-powered analysis of GitHub profiles with brutally direct feedback
 
-A professional web application that analyzes GitHub profiles using Groq AI (Llama 3.3 70B) to provide data-driven insights, strengths, weaknesses, and actionable recommendations.
+A professional web application that analyzes GitHub profiles using OpenRouter AI (Llama 3.3 70B) to provide data-driven insights, strengths, weaknesses, and actionable recommendations.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Go Version](https://img.shields.io/badge/go-1.21+-00ADD8.svg)
-![Groq AI](https://img.shields.io/badge/AI-Groq-orange.svg)
+![OpenRouter AI](https://img.shields.io/badge/AI-OpenRouter-orange.svg)
 
 ## Screenshots
 
@@ -18,7 +18,9 @@ A professional web application that analyzes GitHub profiles using Groq AI (Llam
 
 ## Features
 
-- **AI-Powered Analysis**: Uses Groq's Llama 3.3 70B model for intelligent, human-like evaluation
+- **AI-Powered Analysis**: Uses OpenRouter with automatic model selection (Auto Free → Gemini 2.0 → Llama 3.3 70B → Llama 3.1 405B → Mistral → Qwen)
+- **Smart Fallback System**: Automatically switches models if one is rate-limited
+- **IP-Based Rate Limiting**: 1 request per minute per IP address to prevent abuse
 - **Repository Deep Dive**: Analyzes folder structure and README content of each repository
 - **Smart Prompt Splitting**: Automatically splits large profiles into two API calls if needed
 - **Natural Language**: Responses sound like a real developer, not corporate AI
@@ -27,14 +29,14 @@ A professional web application that analyzes GitHub profiles using Groq AI (Llam
 - **Modern UI**: Beautiful, responsive interface built with Tailwind CSS
 - **Language Persistence**: Remembers your language preference via cookies
 - **REST API**: Full API access for integration with other tools
-- **No Rate Limits**: Uses Groq's generous free tier
+- **Free Tier**: Uses OpenRouter's free models with intelligent fallback
 
 ## Quick Start
 
 ### Prerequisites
 
 - Go 1.21 or higher
-- Groq API Key (free at [console.groq.com](https://console.groq.com/keys))
+- OpenRouter API Key (free at [openrouter.ai/keys](https://openrouter.ai/keys))
 - Optional: GitHub Token (to avoid rate limits)
 
 ### Installation
@@ -56,9 +58,9 @@ cp .env.example .env
 Edit `.env` file:
 
 ```env
-# Groq API Key (REQUIRED)
-# Get it at: https://console.groq.com/keys
-GROQ_API_KEY=groq_api_key
+# OpenRouter API Key (REQUIRED)
+# Get it at: https://openrouter.ai/keys
+OPENROUTER_API_KEY=your_openrouter_api_key
 
 # GitHub Token (OPTIONAL - helps avoid rate limits)
 # Get it at: https://github.com/settings/tokens
@@ -78,7 +80,7 @@ go run main.go
 
 ```bash
 docker build -t github-analyzer .
-docker run -p 8080:8080 -e GROQ_API_KEY=groq_api_key -e GITHUB_TOKEN=github_api_key github-analyzer
+docker run -p 8080:8080 -e OPENROUTER_API_KEY=your_key -e GITHUB_TOKEN=github_token github-analyzer
 ```
 
 Server will start on `http://localhost:8080`
@@ -168,7 +170,7 @@ Your language preference is saved in cookies and restored on next visit.
 ## Tech Stack
 
 - **Backend**: Go (net/http)
-- **AI**: Groq API (Llama 3.3 70B)
+- **AI**: OpenRouter API with intelligent auto-selection (Auto Free → Gemini 2.0 → Llama 3.3 → Llama 3.1 405B → Mistral → Qwen)
 - **Frontend**: Vanilla JavaScript, Tailwind CSS
 - **Data Source**: GitHub REST API
 

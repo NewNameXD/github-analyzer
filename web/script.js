@@ -18,7 +18,7 @@ function getCookie(name) {
 
 const translations = {
     en: {
-        title: 'AI-Powered GitHub Analysis',
+        title: 'GitHub Analysis',
         subtitle: 'Get honest, data-driven insights about any GitHub profile',
         usernamePlaceholder: 'Enter GitHub username',
         analyzeButton: 'Analyze Profile',
@@ -29,9 +29,10 @@ const translations = {
         starButton: 'Star this project',
         supportFooter: 'Your support helps keep this project alive and free for everyone!',
         loadingText: 'Analyzing profile...',
-        footerPowered: 'Powered by Groq AI | Made with',
+        footerPowered: 'Powered by PQPCARA AI | Made with',
         footerBy: 'by',
         errorUsername: 'Please enter a GitHub username',
+        errorRateLimit: 'Please wait {seconds} seconds before analyzing another profile',
         followers: 'followers',
         following: 'following',
         repos: 'repos',
@@ -43,7 +44,7 @@ const translations = {
         aiEvaluation: 'AI Evaluation'
     },
     pt: {
-        title: 'Análise GitHub com IA',
+        title: 'Análise GitHub',
         subtitle: 'Obtenha insights honestos e baseados em dados sobre qualquer perfil GitHub',
         usernamePlaceholder: 'Digite o nome de usuário do GitHub',
         analyzeButton: 'Analisar Perfil',
@@ -54,9 +55,10 @@ const translations = {
         starButton: 'Dar estrela no projeto',
         supportFooter: 'Seu apoio ajuda a manter este projeto vivo e gratuito para todos!',
         loadingText: 'Analisando perfil...',
-        footerPowered: 'Powered by Groq AI | Feito com',
+        footerPowered: 'Powered by PQPCARA AI | Feito com',
         footerBy: 'por',
         errorUsername: 'Por favor, digite um nome de usuário do GitHub',
+        errorRateLimit: 'Aguarde {seconds} segundos antes de analisar outro perfil',
         followers: 'seguidores',
         following: 'seguindo',
         repos: 'repositórios',
@@ -68,7 +70,7 @@ const translations = {
         aiEvaluation: 'Avaliação da IA'
     },
     es: {
-        title: 'Análisis GitHub con IA',
+        title: 'Análisis GitHub',
         subtitle: 'Obtén información honesta y basada en datos sobre cualquier perfil de GitHub',
         usernamePlaceholder: 'Ingrese nombre de usuario de GitHub',
         analyzeButton: 'Analizar Perfil',
@@ -79,9 +81,10 @@ const translations = {
         starButton: 'Dar estrella al proyecto',
         supportFooter: '¡Tu apoyo ayuda a mantener este proyecto vivo y gratuito para todos!',
         loadingText: 'Analizando perfil...',
-        footerPowered: 'Powered by Groq AI | Hecho con',
+        footerPowered: 'Powered by PQPCARA AI | Hecho con',
         footerBy: 'por',
         errorUsername: 'Por favor, ingrese un nombre de usuario de GitHub',
+        errorRateLimit: 'Espere {seconds} segundos antes de analizar otro perfil',
         followers: 'seguidores',
         following: 'siguiendo',
         repos: 'repositorios',
@@ -93,7 +96,7 @@ const translations = {
         aiEvaluation: 'Evaluación de IA'
     },
     fr: {
-        title: 'Analyse GitHub avec IA',
+        title: 'Analyse GitHub',
         subtitle: 'Obtenez des informations honnêtes et basées sur les données sur n\'importe quel profil GitHub',
         usernamePlaceholder: 'Entrez le nom d\'utilisateur GitHub',
         analyzeButton: 'Analyser le Profil',
@@ -104,9 +107,10 @@ const translations = {
         starButton: 'Mettre une étoile au projet',
         supportFooter: 'Votre soutien aide à garder ce projet vivant et gratuit pour tous!',
         loadingText: 'Analyse du profil...',
-        footerPowered: 'Powered by Groq AI | Fait avec',
+        footerPowered: 'Powered by PQPCARA AI | Fait avec',
         footerBy: 'par',
         errorUsername: 'Veuillez entrer un nom d\'utilisateur GitHub',
+        errorRateLimit: 'Veuillez attendre {seconds} secondes avant d\'analyser un autre profil',
         followers: 'abonnés',
         following: 'abonnements',
         repos: 'dépôts',
@@ -118,7 +122,7 @@ const translations = {
         aiEvaluation: 'Évaluation IA'
     },
     de: {
-        title: 'KI-gestützte GitHub-Analyse',
+        title: 'GitHub-Analyse',
         subtitle: 'Erhalten Sie ehrliche, datengestützte Einblicke in jedes GitHub-Profil',
         usernamePlaceholder: 'GitHub-Benutzername eingeben',
         analyzeButton: 'Profil Analysieren',
@@ -129,9 +133,10 @@ const translations = {
         starButton: 'Projekt mit Stern markieren',
         supportFooter: 'Ihre Unterstützung hilft, dieses Projekt am Leben und kostenlos für alle zu halten!',
         loadingText: 'Profil analysieren...',
-        footerPowered: 'Powered by Groq AI | Gemacht mit',
+        footerPowered: 'Powered by PQPCARA AI | Gemacht mit',
         footerBy: 'von',
         errorUsername: 'Bitte geben Sie einen GitHub-Benutzernamen ein',
+        errorRateLimit: 'Bitte warten Sie {seconds} Sekunden, bevor Sie ein anderes Profil analysieren',
         followers: 'Follower',
         following: 'folgt',
         repos: 'Repos',
@@ -143,7 +148,7 @@ const translations = {
         aiEvaluation: 'KI-Bewertung'
     },
     ja: {
-        title: 'AI搭載GitHub分析',
+        title: 'GitHub分析',
         subtitle: '任意のGitHubプロフィールについて正直でデータ駆動型の洞察を取得',
         usernamePlaceholder: 'GitHubユーザー名を入力',
         analyzeButton: 'プロフィールを分析',
@@ -154,9 +159,10 @@ const translations = {
         starButton: 'プロジェクトにスター',
         supportFooter: 'あなたのサポートがこのプロジェクトを維持し、誰でも無料で使えるようにします！',
         loadingText: 'プロフィールを分析中...',
-        footerPowered: 'Powered by Groq AI | 作成者',
+        footerPowered: 'Powered by PQPCARA AI | 作成者',
         footerBy: '',
         errorUsername: 'GitHubユーザー名を入力してください',
+        errorRateLimit: '別のプロフィールを分析する前に{seconds}秒お待ちください',
         followers: 'フォロワー',
         following: 'フォロー中',
         repos: 'リポジトリ',
@@ -168,7 +174,7 @@ const translations = {
         aiEvaluation: 'AI評価'
     },
     zh: {
-        title: 'AI驱动的GitHub分析',
+        title: 'GitHub分析',
         subtitle: '获取关于任何GitHub个人资料的诚实、数据驱动的见解',
         usernamePlaceholder: '输入GitHub用户名',
         analyzeButton: '分析个人资料',
@@ -179,9 +185,10 @@ const translations = {
         starButton: '给项目加星',
         supportFooter: '您的支持帮助保持这个项目活跃并对所有人免费！',
         loadingText: '正在分析个人资料...',
-        footerPowered: 'Powered by Groq AI | 制作者',
+        footerPowered: 'Powered by PQPCARA AI | 制作者',
         footerBy: '',
         errorUsername: '请输入GitHub用户名',
+        errorRateLimit: '请等待{seconds}秒后再分析另一个资料',
         followers: '关注者',
         following: '正在关注',
         repos: '仓库',
@@ -344,7 +351,12 @@ async function evaluate() {
         const data = await response.json();
 
         if (!data.success) {
-            showError(data.error || 'Failed to evaluate profile');
+            if (data.remainingSeconds) {
+                const errorMsg = t.errorRateLimit.replace('{seconds}', data.remainingSeconds);
+                showError(errorMsg);
+            } else {
+                showError(data.error || 'Failed to evaluate profile');
+            }
             return;
         }
 

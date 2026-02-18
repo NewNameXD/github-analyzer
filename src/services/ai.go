@@ -17,19 +17,19 @@ type AIService struct {
 	client *http.Client
 }
 
-type groqRequest struct {
-	Model    string        `json:"model"`
-	Messages []groqMessage `json:"messages"`
+type openRouterRequest struct {
+	Model    string              `json:"model"`
+	Messages []openRouterMessage `json:"messages"`
 }
 
-type groqMessage struct {
+type openRouterMessage struct {
 	Role    string `json:"role"`
 	Content string `json:"content"`
 }
 
-type groqResponse struct {
+type openRouterResponse struct {
 	Choices []struct {
-		Message groqMessage `json:"message"`
+		Message openRouterMessage `json:"message"`
 	} `json:"choices"`
 }
 
@@ -43,7 +43,7 @@ func NewAIService(apiKey string) *AIService {
 func (s *AIService) EvaluateProfile(profile *models.GitHubProfile, language string) (string, error) {
 	prompt := s.buildPrompt(profile, language, len(profile.Repositories))
 
-	result, err := s.callGroqAPI(prompt)
+	result, err := s.callOpenRouterAPI(prompt)
 
 	if err != nil && (strings.Contains(err.Error(), "400") || strings.Contains(err.Error(), "413") || strings.Contains(err.Error(), "too large")) {
 		return s.evaluateInTwoParts(profile, language)
@@ -75,7 +75,7 @@ func (s *AIService) evaluateInTwoParts(profile *models.GitHubProfile, language s
 
 	prompt1 += note
 
-	result1, err := s.callGroqAPI(prompt1)
+	result1, err := s.callOpenRouterAPI(prompt1)
 	if err != nil {
 		return "", fmt.Errorf("error in part 1: %v", err)
 	}
@@ -114,13 +114,13 @@ func (s *AIService) evaluateInTwoParts(profile *models.GitHubProfile, language s
 
 	prompt2 += note2
 
-	messages := []groqMessage{
+	messages := []openRouterMessage{
 		{Role: "user", Content: prompt1},
 		{Role: "assistant", Content: result1},
 		{Role: "user", Content: prompt2},
 	}
 
-	result2, err := s.callGroqAPIWithMessages(messages)
+	result2, err := s.callOpenRouterAPIWithMessages(messages)
 	if err != nil {
 		return "", fmt.Errorf("error in part 2: %v", err)
 	}
@@ -128,23 +128,53 @@ func (s *AIService) evaluateInTwoParts(profile *models.GitHubProfile, language s
 	return result2, nil
 }
 
-func (s *AIService) callGroqAPI(prompt string) (string, error) {
-	return s.callGroqAPIWithMessages([]groqMessage{
+func (s *AIService) callOpenRouterAPI(prompt string) (string, error) {
+	return s.callOpenRouterAPIWithMessages([]openRouterMessage{
 		{Role: "user", Content: prompt},
 	})
 }
 
-func (s *AIService) callGroqAPIWithMessages(messages []groqMessage) (string, error) {
-	reqBody := groqRequest{
-		Model:    "llama-3.3-70b-versatile",
+func (s *AIService) callOpenRouterAPIWithMessages(messages []openRouterMessage) (string, error) {
+	freeModels := []string{
+		"openrouter/auto:free",
+		"google/gemini-2.0-flash-exp:free",
+		"meta-llama/llama-3.3-70b-instruct:free",
+		"meta-llama/llama-3.1-405b-instruct:free",
+		"mistralai/mistral-small-3.1:free",
+		"qwen/qwen-2.5-72b-instruct:free",
+	}
+
+	var lastErr error
+	for _, model := range freeModels {
+		result, err := s.tryModelRequest(model, messages)
+		if err == nil {
+			return result, nil
+		}
+		lastErr = err
+		if !strings.Contains(err.Error(), "429") &&
+			!strings.Contains(err.Error(), "402") &&
+			!strings.Contains(err.Error(), "404") &&
+			!strings.Contains(err.Error(), "rate") {
+			return "", err
+		}
+	}
+
+	return "", fmt.Errorf("all free models are rate-limited or unavailable: %v", lastErr)
+}
+
+func (s *AIService) tryModelRequest(model string, messages []openRouterMessage) (string, error) {
+	reqBody := openRouterRequest{
+		Model:    model,
 		Messages: messages,
 	}
 
 	jsonData, _ := json.Marshal(reqBody)
 
-	req, _ := http.NewRequest("POST", "https://api.groq.com/openai/v1/chat/completions", bytes.NewReader(jsonData))
+	req, _ := http.NewRequest("POST", "https://openrouter.ai/api/v1/chat/completions", bytes.NewReader(jsonData))
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Bearer "+s.apiKey)
+	req.Header.Set("HTTP-Referer", "https://github.com/pqpcara/github-analyzer")
+	req.Header.Set("X-Title", "GitHub Profile Evaluator")
 
 	resp, err := s.client.Do(req)
 	if err != nil {
@@ -154,19 +184,19 @@ func (s *AIService) callGroqAPIWithMessages(messages []groqMessage) (string, err
 
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)
-		return "", fmt.Errorf("Groq API error %d: %s", resp.StatusCode, string(body))
+		return "", fmt.Errorf("OpenRouter API error %d: %s", resp.StatusCode, string(body))
 	}
 
-	var groqResp groqResponse
-	if err := json.NewDecoder(resp.Body).Decode(&groqResp); err != nil {
+	var openRouterResp openRouterResponse
+	if err := json.NewDecoder(resp.Body).Decode(&openRouterResp); err != nil {
 		return "", err
 	}
 
-	if len(groqResp.Choices) == 0 {
+	if len(openRouterResp.Choices) == 0 {
 		return "", fmt.Errorf("empty response")
 	}
 
-	return groqResp.Choices[0].Message.Content, nil
+	return openRouterResp.Choices[0].Message.Content, nil
 }
 
 func (s *AIService) buildPrompt(profile *models.GitHubProfile, language string, maxRepos int) string {
