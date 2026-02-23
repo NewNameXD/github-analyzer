@@ -3,6 +3,7 @@ package services
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"strings"
 	"time"
@@ -62,11 +63,11 @@ type githubOrg struct {
 
 func NewGitHubService(token string) *GitHubService {
 	return &GitHubService{
-		client: &http.Client{Timeout: 15 * time.Second},
+		client: &http.Client{Timeout: 10 * time.Second},
 		proxies: []string{
 			"https://api.github.com",
 		},
-		retries: 3,
+		retries: 2,
 		token:   token,
 	}
 }
@@ -99,29 +100,60 @@ func (s *GitHubService) FetchProfile(username string) (*models.GitHubProfile, er
 	totalStars := 0
 	totalForks := 0
 
-	for _, repo := range repos {
-		if repo.Fork {
-			continue
+	repoLimit := 10
+	repoCount := 0
+
+	type repoData struct {
+		repo      githubRepo
+		readme    string
+		structure []string
+		codeFiles map[string]string
+	}
+
+	repoChan := make(chan repoData, repoLimit)
+
+	go func() {
+		for _, repo := range repos {
+			if repo.Fork {
+				continue
+			}
+			if repoCount >= repoLimit {
+				break
+			}
+			repoCount++
+
+			data := repoData{repo: repo}
+
+			if repoCount <= 5 {
+				data.readme = s.fetchReadme(username, repo.Name)
+				if data.readme == "" {
+					data.structure = s.fetchRepoStructure(username, repo.Name)
+				}
+				data.codeFiles = s.fetchCodeFiles(username, repo.Name)
+			}
+
+			repoChan <- data
 		}
+		close(repoChan)
+	}()
 
-		totalStars += repo.Stars
-		totalForks += repo.Forks
-
-		readmeContent := s.fetchReadme(username, repo.Name)
-		structure := s.fetchRepoStructure(username, repo.Name)
+	for data := range repoChan {
+		totalStars += data.repo.Stars
+		totalForks += data.repo.Forks
 
 		profile.Repositories = append(profile.Repositories, models.Repository{
-			Name:          repo.Name,
-			Description:   repo.Description,
-			Language:      repo.Language,
-			Stars:         repo.Stars,
-			Forks:         repo.Forks,
-			HasReadme:     readmeContent != "",
-			Topics:        repo.Topics,
-			UpdatedAt:     repo.UpdatedAt,
-			HTMLURL:       repo.HTMLURL,
-			ReadmeContent: readmeContent,
-			Structure:     structure,
+			Name:          data.repo.Name,
+			Description:   data.repo.Description,
+			Language:      data.repo.Language,
+			Stars:         data.repo.Stars,
+			Forks:         data.repo.Forks,
+			HasReadme:     data.readme != "",
+			Topics:        data.repo.Topics,
+			UpdatedAt:     data.repo.UpdatedAt,
+			HTMLURL:       data.repo.HTMLURL,
+			ReadmeContent: data.readme,
+			Structure:     data.structure,
+			CodeFiles:     data.codeFiles,
 		})
 	}
 
@@ -371,4 +403,150 @@ func (s *GitHubService) fetchOrganizations(username string) ([]models.Organizati
 	}
 
 	return orgs, nil
+}
+
+func (s *GitHubService) fetchCodeFiles(owner, repo string) map[string]string {
+	codeFiles := make(map[string]string)
+	filesToSkip := map[string]bool{
+		"node_modules": true, "package-lock.json": true,
+		"go.sum": true, "go.mod": true, ".env": true,
+		"yarn.lock": true, "pnpm-lock.yaml": true, ".DS_Store": true,
+		"dist": true, "build": true, ".git": true, ".github": true,
+		"coverage": true, ".next": true, "out": true, "target": true,
+		".venv": true, "venv": true, "__pycache__": true, ".pytest_cache": true,
+		"vendor": true, ".bundle": true, "Gemfile.lock": true,
+		"package.json": true, "Cargo.lock": true, "poetry.lock": true,
+		".gitignore": true, ".env.example": true, ".env.local": true,
+		"LICENSE": true, "CHANGELOG": true, "CHANGELOG.md": true,
+	}
+
+	s.fetchFilesRecursive(owner, repo, "", codeFiles, filesToSkip, 0)
+	return codeFiles
+}
+
+func (s *GitHubService) fetchFilesRecursive(owner, repo, path string, codeFiles map[string]string, skip map[string]bool, depth int) {
+	if depth > 2 || len(codeFiles) > 8 {
+		return
+	}
+
+	for _, baseURL := range s.proxies {
+		url := fmt.Sprintf("%s/repos/%s/%s/contents/%s", baseURL, owner, repo, path)
+		req, _ := http.NewRequest("GET", url, nil)
+		req.Header.Set("Accept", "application/vnd.github.v3+json")
+		req.Header.Set("User-Agent", "GitHub-Profile-Evaluator")
+		if s.token != "" {
+			req.Header.Set("Authorization", "Bearer "+s.token)
+		}
+
+		resp, err := s.client.Do(req)
+		if err != nil {
+			continue
+		}
+		defer resp.Body.Close()
+
+		if resp.StatusCode == http.StatusOK {
+			var contents []githubContent
+			if err := json.NewDecoder(resp.Body).Decode(&contents); err != nil {
+				continue
+			}
+
+			for _, item := range contents {
+				if skip[item.Name] {
+					continue
+				}
+
+				if item.Type == "dir" {
+					newPath := item.Path
+					if newPath != "" {
+						s.fetchFilesRecursive(owner, repo, newPath, codeFiles, skip, depth+1)
+					}
+				} else if isCodeFile(item.Name) && len(codeFiles) < 8 {
+					content := s.fetchFileContent(owner, repo, item.Path)
+					if content != "" && len(content) < 4000 {
+						codeFiles[item.Path] = content
+					}
+				}
+			}
+			break
+		}
+	}
+}
+
+func isCodeFile(filename string) bool {
+	skipExtensions := map[string]bool{
+		".png": true, ".jpg": true, ".jpeg": true, ".gif": true, ".svg": true,
+		".ico": true, ".webp": true, ".bmp": true, ".tiff": true, ".psd": true,
+		".ai": true, ".eps": true, ".heic": true, ".raw": true,
+		".mp3": true, ".mp4": true, ".wav": true, ".flac": true, ".aac": true,
+		".m4a": true, ".ogg": true, ".wma": true, ".mov": true, ".avi": true,
+		".mkv": true, ".webm": true, ".m3u8": true, ".m2ts": true,
+		".zip": true, ".tar": true, ".gz": true, ".rar": true, ".7z": true,
+		".bz2": true, ".xz": true, ".iso": true, ".dmg": true, ".apk": true,
+		".exe": true, ".dll": true, ".so": true, ".dylib": true, ".o": true,
+		".a": true, ".lib": true, ".class": true, ".pyc": true, ".pyo": true,
+		".whl": true, ".jar": true, ".war": true, ".ear": true,
+		".pdf": true, ".doc": true, ".docx": true, ".xls": true, ".xlsx": true,
+		".ppt": true, ".pptx": true, ".odt": true, ".ods": true, ".odp": true,
+		".rtf": true, ".pages": true, ".numbers": true, ".keynote": true,
+		".db": true, ".sqlite": true, ".sqlite3": true, ".mdb": true,
+		".accdb": true, ".dbf": true, ".ibd": true,
+		".ttf": true, ".otf": true, ".woff": true, ".woff2": true, ".eot": true,
+		".swp": true, ".swo": true, ".swn": true,
+	}
+
+	skipFiles := map[string]bool{
+		"package-lock.json": true, "yarn.lock": true, "pnpm-lock.yaml": true,
+		"Gemfile.lock": true, "Cargo.lock": true, "poetry.lock": true,
+		"composer.lock": true, "pubspec.lock": true, "mix.lock": true,
+		".DS_Store": true, "Thumbs.db": true, "desktop.ini": true,
+		".gradle": true, ".m2": true, ".ivy2": true,
+		"gradlew": true, "gradlew.bat": true,
+		"mvnw": true, "mvnw.cmd": true,
+		".npmrc": true, ".yarnrc": true, ".nvmrc": true,
+		".ruby-version": true, ".python-version": true,
+		"Procfile": true, "Procfile.dev": true,
+		".editorconfig": true, ".prettierignore": true,
+		".eslintignore": true, ".stylelintignore": true,
+		"CNAME": true, "robots.txt": true, "sitemap.xml": true,
+		"manifest.json": true, "browserconfig.xml": true,
+		".htaccess": true, "web.config": true,
+	}
+
+	if skipFiles[filename] {
+		return false
+	}
+
+	for ext := range skipExtensions {
+		if strings.HasSuffix(filename, ext) {
+			return false
+		}
+	}
+
+	return true
+}
+
+func (s *GitHubService) fetchFileContent(owner, repo, path string) string {
+	for _, baseURL := range s.proxies {
+		url := fmt.Sprintf("%s/repos/%s/%s/contents/%s", baseURL, owner, repo, path)
+		req, _ := http.NewRequest("GET", url, nil)
+		req.Header.Set("Accept", "application/vnd.github.v3.raw")
+		req.Header.Set("User-Agent", "GitHub-Profile-Evaluator")
+		if s.token != "" {
+			req.Header.Set("Authorization", "Bearer "+s.token)
+		}
+
+		resp, err := s.client.Do(req)
+		if err != nil {
+			continue
+		}
+		defer resp.Body.Close()
+
+		if resp.StatusCode == http.StatusOK {
+			body, err := io.ReadAll(resp.Body)
+			if err == nil {
+				return string(body)
+			}
+		}
+	}
+	return ""
 }

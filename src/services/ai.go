@@ -36,7 +36,7 @@ type openRouterResponse struct {
 func NewAIService(apiKey string) *AIService {
 	return &AIService{
 		apiKey: apiKey,
-		client: &http.Client{Timeout: 60 * time.Second},
+		client: &http.Client{Timeout: 180 * time.Second},
 	}
 }
 
@@ -217,80 +217,80 @@ func (s *AIService) buildPrompt(profile *models.GitHubProfile, language string, 
 	languageMap := map[string]promptText{
 		"en": {
 			instruction:     "Respond in English.",
-			role:            "You're reviewing a GitHub profile. Talk like a real person - casual but knowledgeable. Skip the corporate buzzwords and AI-sounding phrases. Just give honest technical feedback like you would to a friend. CRITICAL: Use ONLY ## (two hashtags) for titles. NEVER use # alone. NEVER add # between sections.",
-			structure:       "Break it down like this:",
-			technical:       "## Technical Chops\n\nWhat's this person actually good at building? Look at the projects, tech choices, and how they organize code. Talk about the languages they know and what kind of stuff they build.",
-			strengths:       "## The Good Stuff\n\nCall out 2-3 things that are legitimately impressive. Use specific examples from their repos. Be genuine.",
-			weaknesses:      "## Where They Can Level Up\n\nWhat's missing or could be better? Be direct but constructive. Focus on stuff that actually matters.",
-			recommendations: "## If I Were Them\n\nGive 3-4 specific things to work on next. Prioritize what'll make the biggest difference in their career. Be practical.",
-			perception:      "## Real Talk\n\nWould you hire them? For what kind of role? What would they be great at? Be honest.",
-			closing:         "Keep it real and direct. No fluff or generic advice. DO NOT add # alone anywhere.",
+			role:            "Read the code. Say what's good, what's shit. No fluff. No corporate speak. Just facts. CRITICAL: Use ONLY ## (two hashtags) for titles. NEVER use # alone.",
+			structure:       "",
+			technical:       "## Code Quality\n\nWhat's the actual quality? Look at error handling, validation, architecture. Is it clean or messy? Does it handle edge cases? Be specific - point to actual problems you see in the code.",
+			strengths:       "## What Works\n\nWhat's actually good in the code? Be specific. Don't say generic shit like 'good structure' - say WHAT is good and WHY.",
+			weaknesses:      "## What's Broken\n\nWhat's bad? Missing error handling? No validation? Messy code? Security issues? Say it straight. Point to actual problems.",
+			recommendations: "## Fix This\n\nWhat needs to change? Be specific. Don't say 'improve error handling' - say WHERE and HOW.",
+			perception:      "## Level\n\nJunior, mid, or senior? Based on what you saw in the code. What can they handle? What can't they?",
+			closing:         "",
 		},
 		"pt": {
 			instruction:     "Responda em Português Brasileiro.",
-			role:            "Você está avaliando um perfil do GitHub. Fale como uma pessoa real - casual mas conhecedor. Sem jargões corporativos ou frases que soam como IA. Só dê feedback técnico honesto como você daria para um amigo. CRÍTICO: Use APENAS ## (dois hashtags) para títulos. NUNCA use # sozinho. NUNCA adicione # entre seções.",
-			structure:       "Divida assim:",
-			technical:       "## Bagagem Técnica\n\nNo que essa pessoa é boa de verdade? Analisa os projetos, escolhas de tech e como organiza o código. Fala sobre as linguagens que ela domina e o tipo de coisa que ela constrói.",
-			strengths:       "## O Que Tá Bom\n\nDestaca 2-3 coisas que são realmente impressionantes. Usa exemplos específicos dos repos dela. Seja genuíno.",
-			weaknesses:      "## Onde Pode Melhorar\n\nO que tá faltando ou poderia ser melhor? Seja direto mas construtivo. Foca em coisas que realmente importam.",
-			recommendations: "## Se Fosse Eu\n\nDá 3-4 coisas específicas pra trabalhar agora. Prioriza o que vai fazer mais diferença na carreira. Seja prático.",
-			perception:      "## Papo Reto\n\nVocê contrataria? Pra que tipo de vaga? O que essa pessoa mandaria bem? Seja honesto.",
-			closing:         "Seja real e direto. Sem enrolação ou conselhos genéricos. NÃO adicione # sozinho em nenhum lugar.",
+			role:            "Leia o código. Fale o que é bom, o que é ruim. Sem enrolação. Sem papo corporativo. Só fatos. CRÍTICO: Use APENAS ## (dois hashtags) para títulos. NUNCA use # sozinho.",
+			structure:       "",
+			technical:       "## Qualidade do Código\n\nQual é a qualidade real? Olhe tratamento de erro, validação, arquitetura. Tá limpo ou bagunçado? Trata casos extremos? Seja específico - aponte problemas reais que você viu no código.",
+			strengths:       "## O Que Funciona\n\nO que é realmente bom no código? Seja específico. Não fale genérico tipo 'boa estrutura' - fale O QUE é bom e POR QUÊ.",
+			weaknesses:      "## O Que Tá Quebrado\n\nO que é ruim? Falta tratamento de erro? Sem validação? Código bagunçado? Problemas de segurança? Fale direto. Aponte problemas reais.",
+			recommendations: "## Conserta Isso\n\nO que precisa mudar? Seja específico. Não fale 'melhore tratamento de erro' - fale ONDE e COMO.",
+			perception:      "## Nível\n\nJunior, mid ou senior? Baseado no que você viu no código. O que ele consegue fazer? O que não consegue?",
+			closing:         "",
 		},
 		"es": {
 			instruction:     "Responde en Español.",
-			role:            "Estás evaluando un perfil de GitHub. Habla como una persona real - casual pero conocedor. Sin jerga corporativa o frases que suenan a IA. Solo da feedback técnico honesto como lo harías con un amigo. CRÍTICO: Usa SOLO ## (dos hashtags) para títulos. NUNCA uses # solo. NUNCA agregues # entre secciones.",
-			structure:       "Divídelo así:",
-			technical:       "## Habilidades Técnicas Reales\n\n¿En qué es realmente buena esta persona? Mira los proyectos, elecciones técnicas y cómo organiza el código. Habla de los lenguajes que domina y qué tipo de cosas construye.",
-			strengths:       "## Lo Bueno\n\nDestaca 2-3 cosas que son genuinamente impresionantes. Usa ejemplos específicos de sus repos. Sé genuino.",
-			weaknesses:      "## Donde Puede Mejorar\n\n¿Qué falta o podría ser mejor? Sé directo pero constructivo. Enfócate en cosas que realmente importan.",
-			recommendations: "## Si Fuera Yo\n\nDa 3-4 cosas específicas en las que trabajar ahora. Prioriza lo que hará la mayor diferencia en su carrera. Sé práctico.",
-			perception:      "## Hablando Claro\n\n¿Lo contratarías? ¿Para qué tipo de puesto? ¿En qué sería excelente? Sé honesto.",
-			closing:         "Sé real y directo. Sin relleno o consejos genéricos. NO agregues # solo en ningún lugar.",
+			role:            "Lee el código. Di qué es bueno, qué es malo. Sin rodeos. Sin habla corporativa. Solo hechos. CRÍTICO: Usa SOLO ## (dos hashtags) para títulos. NUNCA uses # solo.",
+			structure:       "",
+			technical:       "## Calidad del Código\n\n¿Cuál es la calidad real? Mira manejo de errores, validación, arquitectura. ¿Está limpio o desordenado? ¿Maneja casos extremos? Sé específico - señala problemas reales que viste en el código.",
+			strengths:       "## Lo Que Funciona\n\n¿Qué es realmente bueno en el código? Sé específico. No digas cosas genéricas como 'buena estructura' - di QUÉ es bueno y POR QUÉ.",
+			weaknesses:      "## Lo Que Está Roto\n\n¿Qué es malo? ¿Falta manejo de errores? ¿Sin validación? ¿Código desordenado? ¿Problemas de seguridad? Dilo directo. Señala problemas reales.",
+			recommendations: "## Arregla Esto\n\n¿Qué necesita cambiar? Sé específico. No digas 'mejora el manejo de errores' - di DÓNDE y CÓMO.",
+			perception:      "## Nivel\n\n¿Junior, mid o senior? Basado en lo que viste en el código. ¿Qué puede manejar? ¿Qué no puede?",
+			closing:         "",
 		},
 		"fr": {
 			instruction:     "Répondez en Français.",
-			role:            "Tu évalues un profil GitHub. Parle comme une vraie personne - décontracté mais compétent. Sans jargon corporate ou phrases qui sonnent IA. Donne juste un feedback technique honnête comme tu le ferais avec un ami. CRITIQUE: Utilise SEULEMENT ## (deux hashtags) pour les titres. JAMAIS # seul. JAMAIS ajouter # entre les sections.",
-			structure:       "Découpe comme ça:",
-			technical:       "## Compétences Techniques Réelles\n\nDans quoi cette personne est vraiment bonne? Regarde les projets, choix tech et comment le code est organisé. Parle des langages qu'elle maîtrise et du type de trucs qu'elle construit.",
-			strengths:       "## Ce Qui Est Bien\n\nSouligne 2-3 choses qui sont vraiment impressionnantes. Utilise des exemples spécifiques de leurs repos. Sois authentique.",
-			weaknesses:      "## Où Progresser\n\nQu'est-ce qui manque ou pourrait être mieux? Sois direct mais constructif. Concentre-toi sur ce qui compte vraiment.",
-			recommendations: "## Si C'était Moi\n\nDonne 3-4 trucs spécifiques sur lesquels bosser maintenant. Priorise ce qui fera la plus grande différence dans sa carrière. Sois pratique.",
-			perception:      "## Franchement\n\nTu l'embaucherais? Pour quel genre de poste? Dans quoi serait-elle excellente? Sois honnête.",
-			closing:         "Reste vrai et direct. Sans blabla ou conseils génériques. NE PAS ajouter # seul nulle part.",
+			role:            "Lisez le code. Dites ce qui est bon, ce qui est mauvais. Sans détour. Sans parler corporate. Juste des faits. CRITIQUE: Utilisez SEULEMENT ## (deux hashtags) pour les titres. JAMAIS # seul.",
+			structure:       "",
+			technical:       "## Qualité du Code\n\nQuelle est la qualité réelle? Regardez la gestion des erreurs, la validation, l'architecture. C'est propre ou désordonné? Gère-t-il les cas limites? Soyez spécifique - pointez les vrais problèmes que vous voyez dans le code.",
+			strengths:       "## Ce Qui Marche\n\nQu'est-ce qui est vraiment bon dans le code? Soyez spécifique. Ne dites pas des trucs génériques comme 'bonne structure' - dites CE QUI est bon et POURQUOI.",
+			weaknesses:      "## Ce Qui Est Cassé\n\nQu'est-ce qui est mauvais? Manque de gestion d'erreurs? Pas de validation? Code désordonné? Problèmes de sécurité? Dites-le directement. Pointez les vrais problèmes.",
+			recommendations: "## Réparez Ça\n\nQu'est-ce qui doit changer? Soyez spécifique. Ne dites pas 'améliorez la gestion des erreurs' - dites OÙ et COMMENT.",
+			perception:      "## Niveau\n\nJunior, mid ou senior? Basé sur ce que vous avez vu dans le code. Qu'est-ce qu'il peut gérer? Qu'est-ce qu'il ne peut pas?",
+			closing:         "",
 		},
 		"de": {
 			instruction:     "Antworten Sie auf Deutsch.",
-			role:            "Du bewertest ein GitHub-Profil. Rede wie ein echter Mensch - locker aber kompetent. Ohne Unternehmens-Jargon oder KI-klingende Phrasen. Gib einfach ehrliches technisches Feedback wie du es einem Freund geben würdest. KRITISCH: Verwende NUR ## (zwei Hashtags) für Titel. NIEMALS # allein. NIEMALS # zwischen Abschnitten hinzufügen.",
-			structure:       "Teile es so auf:",
-			technical:       "## Echte Technische Fähigkeiten\n\nWorin ist diese Person wirklich gut? Schau dir die Projekte, Tech-Entscheidungen und Code-Organisation an. Sprich über die Sprachen, die sie beherrscht, und was für Sachen sie baut.",
-			strengths:       "## Das Gute Zeug\n\nHebe 2-3 Dinge hervor, die wirklich beeindruckend sind. Nutze spezifische Beispiele aus ihren Repos. Sei authentisch.",
-			weaknesses:      "## Wo Verbesserung Möglich Ist\n\nWas fehlt oder könnte besser sein? Sei direkt aber konstruktiv. Konzentriere dich auf Dinge, die wirklich wichtig sind.",
-			recommendations: "## Wenn Ich Es Wäre\n\nGib 3-4 spezifische Dinge, an denen jetzt gearbeitet werden sollte. Priorisiere, was den größten Unterschied in der Karriere machen wird. Sei praktisch.",
-			perception:      "## Ehrlich Gesagt\n\nWürdest du sie einstellen? Für welche Art von Rolle? Worin wäre sie großartig? Sei ehrlich.",
-			closing:         "Bleib echt und direkt. Kein Füllmaterial oder generische Ratschläge. Füge NIRGENDWO # allein hinzu.",
+			role:            "Lesen Sie den Code. Sagen Sie, was gut ist, was schlecht ist. Ohne Umschweife. Ohne Unternehmenssprache. Nur Fakten. KRITISCH: Verwenden Sie NUR ## (zwei Hashtags) für Titel. NIEMALS # allein.",
+			structure:       "",
+			technical:       "## Code-Qualität\n\nWie ist die tatsächliche Qualität? Schauen Sie sich Fehlerbehandlung, Validierung, Architektur an. Ist es sauber oder unordentlich? Behandelt es Grenzfälle? Seien Sie spezifisch - zeigen Sie echte Probleme, die Sie im Code sehen.",
+			strengths:       "## Was Funktioniert\n\nWas ist wirklich gut im Code? Seien Sie spezifisch. Sagen Sie nicht generische Dinge wie 'gute Struktur' - sagen Sie WAS gut ist und WARUM.",
+			weaknesses:      "## Was Kaputt Ist\n\nWas ist schlecht? Fehlende Fehlerbehandlung? Keine Validierung? Unordentlicher Code? Sicherheitsprobleme? Sagen Sie es direkt. Zeigen Sie echte Probleme.",
+			recommendations: "## Reparieren Sie Das\n\nWas muss sich ändern? Seien Sie spezifisch. Sagen Sie nicht 'verbessern Sie die Fehlerbehandlung' - sagen Sie WO und WIE.",
+			perception:      "## Niveau\n\nJunior, mid oder senior? Basierend auf dem, was Sie im Code gesehen haben. Was kann er handhaben? Was nicht?",
+			closing:         "",
 		},
 		"ja": {
 			instruction:     "日本語で回答してください。",
-			role:            "GitHubプロフィールを評価しています。本物の人間のように話してください - カジュアルだけど知識がある。企業用語やAIっぽいフレーズは抜きで。友達に言うような正直な技術的フィードバックをください。重要：タイトルには##（ハッシュタグ2つ）のみを使用。#単独は絶対に使わない。セクション間に#を追加しない。",
-			structure:       "こんな感じで分けて:",
-			technical:       "## 実際の技術力\n\nこの人は何が本当に得意？プロジェクト、技術選択、コード構成を見て。得意な言語と作っているものの種類について話して。",
-			strengths:       "## 良いところ\n\n本当に印象的な2-3のことを挙げて。リポジトリから具体的な例を使って。本物であること。",
-			weaknesses:      "## 改善できるところ\n\n何が足りないか、何が良くなるか？率直に、でも建設的に。本当に重要なことに焦点を当てて。",
-			recommendations: "## 自分だったら\n\n今取り組むべき3-4の具体的なこと。キャリアで最大の違いを生むことを優先して。実用的に。",
-			perception:      "## 本音で\n\n採用する？どんな役割で？何が得意？正直に。",
-			closing:         "リアルに、率直に。余計なことや一般的なアドバイスなしで。どこにも#単独を追加しない。",
+			role:            "コードを読んでください。何が良くて何が悪いか言ってください。回りくどくなく。企業的な話し方なく。事実だけ。重要：タイトルには##（ハッシュタグ2つ）のみを使用。#単独は絶対に使わない。",
+			structure:       "",
+			technical:       "## コード品質\n\n実際の品質は？エラーハンドリング、検証、アーキテクチャを見てください。きれいですか、それとも乱雑ですか？エッジケースを処理していますか？具体的に - コードで見た実際の問題を指摘してください。",
+			strengths:       "## 機能するもの\n\nコードで本当に良いものは何ですか？具体的に。「良い構造」のような一般的なことを言わないでください - 何が良くて、なぜかを言ってください。",
+			weaknesses:      "## 壊れているもの\n\n何が悪いですか？エラーハンドリングがない？検証がない？乱雑なコード？セキュリティ問題？直接言ってください。実際の問題を指摘してください。",
+			recommendations: "## これを修正\n\n何を変える必要がありますか？具体的に。「エラーハンドリングを改善」と言わないでください - どこでどのようにかを言ってください。",
+			perception:      "## レベル\n\nジュニア、ミッド、またはシニア？コードで見たものに基づいて。何を扱えますか？何を扱えませんか？",
+			closing:         "",
 		},
 		"zh": {
 			instruction:     "请用中文回答。",
-			role:            "你在评估一个GitHub个人资料。像真人一样说话 - 随意但有见识。不要用企业术语或听起来像AI的短语。就像对朋友一样给出诚实的技术反馈。关键：只使用##（两个井号）作为标题。绝不单独使用#。绝不在章节之间添加#。",
-			structure:       "这样分解:",
-			technical:       "## 真实技术能力\n\n这个人真正擅长什么？看看项目、技术选择和代码组织。谈谈他们掌握的语言和构建的东西类型。",
-			strengths:       "## 好的方面\n\n指出2-3个真正令人印象深刻的东西。用他们仓库的具体例子。要真诚。",
-			weaknesses:      "## 可以改进的地方\n\n缺少什么或可以更好？直接但建设性。专注于真正重要的事情。",
-			recommendations: "## 如果是我\n\n给出3-4个现在要做的具体事情。优先考虑对职业生涯影响最大的。要实用。",
-			perception:      "## 实话实说\n\n你会雇用他们吗？担任什么角色？他们会擅长什么？诚实点。",
-			closing:         "保持真实和直接。不要废话或通用建议。任何地方都不要单独添加#。",
+			role:            "阅读代码。说什么好，什么不好。不要绕圈子。不要企业话术。只要事实。关键：标题只使用##（两个井号）。绝不单独使用#。",
+			structure:       "",
+			technical:       "## 代码质量\n\n实际质量如何？看错误处理、验证、架构。干净还是混乱？处理边界情况吗？具体说明 - 指出您在代码中看到的实际问题。",
+			strengths:       "## 有效的东西\n\n代码中真正好的是什么？具体说明。不要说\"良好的结构\"之类的泛泛之谈 - 说什么好以及为什么。",
+			weaknesses:      "## 坏掉的东西\n\n什么不好？缺少错误处理？没有验证？混乱的代码？安全问题？直说。指出实际问题。",
+			recommendations: "## 修复这个\n\n需要改变什么？具体说明。不要说\"改进错误处理\" - 说在哪里以及如何。",
+			perception:      "## 水平\n\n初级、中级还是高级？基于您在代码中看到的。他能处理什么？不能处理什么？",
+			closing:         "",
 		},
 	}
 
@@ -305,13 +305,9 @@ func (s *AIService) buildPrompt(profile *models.GitHubProfile, language string, 
 	if profile.Bio != "" {
 		fmt.Fprintf(&sb, "Bio: %s\n", profile.Bio)
 	}
-	if profile.Location != "" || profile.Company != "" {
-		fmt.Fprintf(&sb, "Location: %s | Company: %s\n", profile.Location, profile.Company)
-	}
-	fmt.Fprintf(&sb, "Followers: %d | Following: %d | Repos: %d\n\n",
-		profile.Followers, profile.Following, profile.PublicRepos)
+	fmt.Fprintf(&sb, "\n")
 
-	sb.WriteString("REPOSITORIES:\n")
+	sb.WriteString("CODE TO REVIEW:\n")
 	repoCount := 0
 	for _, repo := range profile.Repositories {
 		if repoCount >= maxRepos {
@@ -319,40 +315,36 @@ func (s *AIService) buildPrompt(profile *models.GitHubProfile, language string, 
 		}
 		repoCount++
 
-		fmt.Fprintf(&sb, "\n%d. %s", repoCount, repo.Name)
+		fmt.Fprintf(&sb, "\n=== REPO %d: %s ===\n", repoCount, repo.Name)
 		if repo.Language != "" {
-			fmt.Fprintf(&sb, " [%s]", repo.Language)
+			fmt.Fprintf(&sb, "Language: %s\n", repo.Language)
 		}
-		fmt.Fprintf(&sb, " - ⭐ %d | 🔀 %d\n", repo.Stars, repo.Forks)
-
 		if repo.Description != "" {
-			fmt.Fprintf(&sb, "   Description: %s\n", repo.Description)
+			fmt.Fprintf(&sb, "Desc: %s\n", repo.Description)
 		}
 
-		if len(repo.Topics) > 0 {
-			fmt.Fprintf(&sb, "   Topics: %v\n", repo.Topics)
-		}
-
-		if len(repo.Structure) > 0 {
-			fmt.Fprintf(&sb, "   Structure: %v\n", repo.Structure)
-		}
-
-		if repo.ReadmeContent != "" {
-			readmePreview := repo.ReadmeContent
-			if len(readmePreview) > 400 {
-				readmePreview = readmePreview[:400] + "..."
+		if len(repo.CodeFiles) > 0 {
+			fileCount := 0
+			for path, content := range repo.CodeFiles {
+				if fileCount >= 4 {
+					break
+				}
+				fileCount++
+				if len(content) > 1000 {
+					content = content[:1000] + "..."
+				}
+				fmt.Fprintf(&sb, "\n%s:\n%s\n", path, content)
 			}
-			fmt.Fprintf(&sb, "   README: %s\n", readmePreview)
+		} else if repo.ReadmeContent != "" {
+			readme := repo.ReadmeContent
+			if len(readme) > 400 {
+				readme = readme[:400] + "..."
+			}
+			fmt.Fprintf(&sb, "\nREADME: %s\n", readme)
 		}
 	}
 
-	fmt.Fprintf(&sb, "\n\n%s\n\n", lang.structure)
-	fmt.Fprintf(&sb, "%s\n\n", lang.technical)
-	fmt.Fprintf(&sb, "%s\n\n", lang.strengths)
-	fmt.Fprintf(&sb, "%s\n\n", lang.weaknesses)
-	fmt.Fprintf(&sb, "%s\n\n", lang.recommendations)
-	fmt.Fprintf(&sb, "%s\n\n", lang.perception)
-	fmt.Fprintf(&sb, "%s", lang.closing)
+	fmt.Fprintf(&sb, "\n%s\n%s\n%s\n%s\n%s", lang.technical, lang.strengths, lang.weaknesses, lang.recommendations, lang.perception)
 
 	return sb.String()
 }

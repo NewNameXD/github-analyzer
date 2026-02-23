@@ -25,17 +25,18 @@ type Organization struct {
 }
 
 type Repository struct {
-	Name          string   `json:"name"`
-	Description   string   `json:"description"`
-	Language      string   `json:"language"`
-	Stars         int      `json:"stars"`
-	Forks         int      `json:"forks"`
-	HasReadme     bool     `json:"has_readme"`
-	Topics        []string `json:"topics"`
-	UpdatedAt     string   `json:"updated_at"`
-	HTMLURL       string   `json:"html_url"`
-	ReadmeContent string   `json:"readme_content,omitempty"`
-	Structure     []string `json:"structure,omitempty"`
+	Name          string            `json:"name"`
+	Description   string            `json:"description"`
+	Language      string            `json:"language"`
+	Stars         int               `json:"stars"`
+	Forks         int               `json:"forks"`
+	HasReadme     bool              `json:"has_readme"`
+	Topics        []string          `json:"topics"`
+	UpdatedAt     string            `json:"updated_at"`
+	HTMLURL       string            `json:"html_url"`
+	ReadmeContent string            `json:"readme_content,omitempty"`
+	Structure     []string          `json:"structure,omitempty"`
+	CodeFiles     map[string]string `json:"code_files,omitempty"`
 }
 
 type EvaluationRequest struct {
